@@ -1,0 +1,215 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
+
+  /* Modern Scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-200 rounded-full hover:bg-gray-300 transition-colors;
+  }
+}
+
+@layer components {
+  /* Card Styles */
+  .edc-card {
+    @apply bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200;
+  }
+
+  /* Button Styles */
+  .btn-primary {
+    @apply px-4 py-2 bg-gradient-to-r from-[#0EA5E9] to-[#2DD4BF] text-white font-medium rounded-lg 
+           hover:opacity-90 transition-all shadow-sm shadow-[#0EA5E9]/20 disabled:opacity-50;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-white text-gray-700 font-medium rounded-lg border border-gray-100
+           hover:bg-gray-50 transition-all disabled:opacity-50;
+  }
+
+  .btn-outline {
+    @apply px-4 py-2 bg-transparent text-gray-700 font-medium rounded-lg border border-gray-100
+           hover:bg-gray-50 transition-all disabled:opacity-50;
+  }
+
+  /* Input Styles */
+  .input-field {
+    @apply w-full px-3 py-2 bg-white border border-gray-100 rounded-lg text-gray-900 
+           placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/50 
+           focus:border-transparent transition-all disabled:opacity-50;
+  }
+
+  /* Table Styles */
+  .edc-table {
+    @apply w-full border-collapse;
+  }
+
+  .edc-table th {
+    @apply px-4 py-3 text-left text-sm font-medium text-gray-600 bg-gray-50 border-b border-gray-100;
+  }
+
+  .edc-table td {
+    @apply px-4 py-3 text-sm text-gray-700 border-b border-gray-100;
+  }
+
+  .edc-table tr:hover {
+    @apply bg-gray-50/50;
+  }
+
+  /* Badge Styles */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-blue {
+    @apply bg-blue-50 text-blue-700;
+  }
+
+  .badge-green {
+    @apply bg-green-50 text-green-700;
+  }
+
+  .badge-yellow {
+    @apply bg-yellow-50 text-yellow-700;
+  }
+
+  .badge-red {
+    @apply bg-red-50 text-red-700;
+  }
+
+  /* Navigation Styles */
+  .nav-link {
+    @apply flex items-center px-3 py-2 text-sm text-gray-600 rounded-lg hover:bg-gray-50 
+           hover:text-gray-900 transition-colors;
+  }
+
+  .nav-link.active {
+    @apply bg-[#0EA5E9]/5 text-[#0EA5E9];
+  }
+
+  /* Section Headers */
+  .section-title {
+    @apply text-lg font-semibold text-gray-900;
+  }
+
+  .section-subtitle {
+    @apply text-sm text-gray-500;
+  }
+
+  /* Form Groups */
+  .form-group {
+    @apply space-y-1;
+  }
+
+  .form-label {
+    @apply block text-sm font-medium text-gray-700;
+  }
+
+  .form-hint {
+    @apply text-xs text-gray-500;
+  }
+
+  .form-error {
+    @apply text-xs text-red-600;
+  }
+
+  /* Dropdown Menu */
+  .dropdown-menu {
+    @apply absolute right-0 mt-1 w-48 bg-white rounded-lg border border-gray-100 shadow-lg 
+           overflow-hidden z-50;
+  }
+
+  .dropdown-item {
+    @apply flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors;
+  }
+
+  /* Modal Styles */
+  .modal-backdrop {
+    @apply fixed inset-0 bg-black/40 backdrop-blur-sm;
+  }
+
+  .modal-content {
+    @apply w-full max-w-md transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all;
+  }
+
+  /* Loading States */
+  .loading-skeleton {
+    @apply animate-pulse bg-gray-100 rounded;
+  }
+
+  /* Tooltips */
+  .tooltip {
+    @apply absolute z-50 px-2 py-1 text-xs text-white bg-gray-900 rounded shadow-lg;
+  }
+}
+
+@layer utilities {
+  .bg-300% {
+    background-size: 300% 300%;
+  }
+
+  .animate-gradient {
+    animation: moveGradient 8s ease infinite;
+  }
+}
+
+@keyframes moveGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.prose {
+  @apply max-w-none;
+  
+  h1 {
+    @apply text-3xl font-bold mb-6 text-gray-900;
+  }
+  
+  h2 {
+    @apply text-2xl font-semibold mb-4 text-gray-900;
+  }
+  
+  h3 {
+    @apply text-xl font-medium mb-3 text-gray-900;
+  }
+  
+  p {
+    @apply mb-4 text-gray-700 leading-relaxed;
+  }
+  
+  ul, ol {
+    @apply mb-4 pl-6;
+  }
+  
+  li {
+    @apply mb-2;
+  }
+}
