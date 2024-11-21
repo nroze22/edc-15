@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, FileSpreadsheet } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -27,7 +27,7 @@ export default function Navbar({ onSignIn, onSignUp }: NavbarProps) {
               alt="Talosix" 
               className="h-12 w-12"
             />
-            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#0EA5E9] to-[#2DD4BF]">
+            <span className="text-2xl font-bold text-[#0EA5E9]/80">
               Talosix
             </span>
           </Link>
@@ -45,7 +45,7 @@ export default function Navbar({ onSignIn, onSignUp }: NavbarProps) {
             </button>
             <button
               onClick={onSignUp}
-              className="inline-flex items-center justify-center px-6 py-3 rounded-lg text-sm font-medium text-white bg-gradient-to-r from-[#0EA5E9] to-[#2DD4BF] hover:opacity-90 transition-all shadow-lg shadow-[#0EA5E9]/20"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-lg text-sm font-medium text-white bg-[#0EA5E9]/80 hover:opacity-90 transition-all shadow-lg shadow-[#0EA5E9]/20"
             >
               Start Free Trial
             </button>
@@ -94,6 +94,12 @@ export default function Navbar({ onSignIn, onSignUp }: NavbarProps) {
             >
               About
             </a>
+            <a
+              href="/crf-builder"
+              className="block px-3 py-2 rounded-md text-base text-white/70 hover:text-white hover:bg-white/5"
+            >
+              CRF Builder
+            </a>
             <button
               onClick={onSignIn}
               className="block w-full text-left px-3 py-2 rounded-md text-base text-white/70 hover:text-white hover:bg-white/5"
@@ -102,7 +108,7 @@ export default function Navbar({ onSignIn, onSignUp }: NavbarProps) {
             </button>
             <button
               onClick={onSignUp}
-              className="block w-full px-3 py-2 rounded-md text-base text-white bg-gradient-to-r from-[#0EA5E9] to-[#2DD4BF] hover:opacity-90"
+              className="block w-full px-3 py-2 rounded-md text-base text-white bg-[#0EA5E9]/80 hover:opacity-90"
             >
               Start Free Trial
             </button>

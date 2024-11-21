@@ -85,11 +85,11 @@ export default function Features() {
     <div id="features" className="py-24 bg-white sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-base font-semibold leading-7 text-indigo-600">Everything You Need</h2>
+          <h2 className="text-base font-bold leading-7 text-indigo-600">Everything You Need</h2>
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             Enterprise Power, Without Enterprise Complexity
           </p>
-          <p className="mt-6 text-lg leading-8 text-gray-600">
+          <p className="mt-6 text-lg font-bold leading-8 text-gray-600">
             Purpose-built for small to mid-size CROs, our EDC combines powerful features with
             intuitive design. Get everything you need, nothing you don't.
           </p>

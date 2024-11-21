@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, Outlet } from 'react-router-dom';
 import { 
   LayoutGrid,
   FileText, 
@@ -49,17 +49,17 @@ import {
   AlertTriangle,
   MessageCircle,
   Mail,
-  Share2
+  Share2,
+  GraduationCap
 } from 'lucide-react';
 import { useSettingsStore } from '../../stores/settingsStore';
 import clsx from 'classnames';
 
 interface AppLayoutProps {
-  children: React.ReactNode;
   onSignOut?: () => void;
 }
 
-export default function AppLayout({ children, onSignOut }: AppLayoutProps) {
+export default function AppLayout({ onSignOut }: AppLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [expandedGroups, setExpandedGroups] = useState<string[]>(['study']);
@@ -77,10 +77,11 @@ export default function AppLayout({ children, onSignOut }: AppLayoutProps) {
       group: 'study',
       icon: FileText,
       children: [
+        { name: 'Study Information', href: '/app/study-information', icon: FileText },
         { name: 'Study Setup', href: '/app/study-setup', icon: Workflow },
         { name: 'Protocol Analysis', href: '/app/protocol-analysis', icon: FileText },
-        { name: 'Form Builder', href: '/app/form-builder', icon: FormInput },
         { name: 'Study Schedule', href: '/app/study-schedule', icon: Calendar },
+        { name: 'CRF Builder', href: '/app/crf-builder', icon: FormInput },
         { 
           name: 'AI Suggestions', 
           href: '/app/ai-suggestions', 
@@ -95,6 +96,7 @@ export default function AppLayout({ children, onSignOut }: AppLayoutProps) {
       group: 'data',
       icon: Database,
       children: [
+        { name: 'Patient Data', href: '/app/patient-data', icon: UserCircle },
         { name: 'Data Entry', href: '/app/data-entry', icon: FileText },
         { name: 'Query Management', href: '/app/queries', icon: AlertCircle },
         { name: 'Data Export', href: '/app/export', icon: Download }
@@ -106,9 +108,10 @@ export default function AppLayout({ children, onSignOut }: AppLayoutProps) {
       icon: Building2,
       children: [
         { name: 'Sites Overview', href: '/app/sites', icon: Map },
-        { name: 'Investigator Directory', href: '/app/investigators', icon: UserCog },
+        { name: 'Site Setup', href: '/app/site-setup', icon: Settings },
         { name: 'Site Staff', href: '/app/site-staff', icon: Users },
         { name: 'Site Documents', href: '/app/site-documents', icon: FileText },
+        { name: 'Site Training', href: '/app/site-training', icon: GraduationCap },
         { name: 'Site Monitoring', href: '/app/monitoring', icon: LineChart }
       ]
     },
@@ -226,17 +229,19 @@ export default function AppLayout({ children, onSignOut }: AppLayoutProps) {
       )}>
         {/* Logo Section */}
         <div className="h-16 flex items-center justify-between px-4 bg-[#0A1221]">
-          <div className="flex items-center space-x-2">
-            <img src="https://framerusercontent.com/images/021L73kQYq9ZIfe4FnXRxtsHM.svg" alt="Logo" className="h-8 w-8" />
+          <div className="flex items-center min-w-0">
+            <div className="flex-shrink-0 w-8 h-8">
+              <img src="https://framerusercontent.com/images/021L73kQYq9ZIfe4FnXRxtsHM.svg" alt="Logo" className="h-full w-full" />
+            </div>
             {isSidebarOpen && (
-              <span className="text-lg font-semibold bg-clip-text text-transparent bg-gradient-to-r from-[#0EA5E9] to-[#2DD4BF]">
+              <span className="ml-2 text-lg font-semibold bg-clip-text text-transparent bg-gradient-to-r from-[#0EA5E9] to-[#2DD4BF] whitespace-nowrap">
                 Talosix EDC
               </span>
             )}
           </div>
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="rounded-lg p-1 text-gray-400 hover:bg-[#1E293B] transition-colors"
+            className="flex-shrink-0 rounded-lg p-1 text-gray-400 hover:bg-[#1E293B] transition-colors"
           >
             {isSidebarOpen ? (
               <ChevronLeft className="h-5 w-5" />
@@ -377,7 +382,7 @@ export default function AppLayout({ children, onSignOut }: AppLayoutProps) {
         isSidebarOpen ? 'lg:pl-64' : 'lg:pl-20'
       )}>
         <main className="flex-1">
-          {children}
+          <Outlet />
         </main>
       </div>
     </div>

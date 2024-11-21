@@ -50,28 +50,30 @@ export default function AIChat() {
         </button>
       ) : (
         <div
-          className={`bg-white rounded-lg shadow-xl flex flex-col ${
-            isExpanded ? 'fixed top-4 right-4 left-4 bottom-4' : 'w-96 h-[600px]'
+          className={`bg-white rounded-lg shadow-xl flex flex-col overflow-hidden ${
+            isExpanded 
+              ? 'fixed top-4 right-4 left-4 bottom-4 m-0' 
+              : 'w-[400px] h-[600px] max-h-[calc(100vh-2rem)]'
           }`}
         >
-          <div className="flex items-center justify-between p-4 border-b">
-            <div className="flex space-x-4">
+          <div className="flex items-center justify-between p-4 border-b bg-white sticky top-0 z-10">
+            <div className="flex space-x-2 overflow-x-auto hide-scrollbar">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center space-x-2 px-3 py-1 rounded-md ${
+                  className={`flex items-center space-x-2 px-3 py-1 rounded-md flex-shrink-0 ${
                     activeTab === tab.id
                       ? 'bg-indigo-100 text-indigo-700'
                       : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
                   <tab.icon className="w-4 h-4" />
-                  <span className="text-sm font-medium">{tab.label}</span>
+                  <span className="text-sm font-medium whitespace-nowrap">{tab.label}</span>
                 </button>
               ))}
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="p-1 hover:bg-gray-100 rounded"

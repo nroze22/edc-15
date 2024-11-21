@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings as SettingsIcon, Key, Sliders, Hash, Save, RefreshCw } from 'lucide-react';
+import { Settings as SettingsIcon, Key, Sliders, Hash, Save, RefreshCw, Check, AlertTriangle } from 'lucide-react';
 import { useSettingsStore } from '../stores/settingsStore';
 
 export default function Settings() {
@@ -13,6 +13,7 @@ export default function Settings() {
     setTemperature,
     setMaxTokens,
     clearSettings,
+    hasValidApiKey,
   } = useSettingsStore();
 
   const [showApiKey, setShowApiKey] = useState(false);
@@ -51,17 +52,35 @@ export default function Settings() {
                   type={showApiKey ? 'text' : 'password'}
                   value={openAIApiKey || ''}
                   onChange={(e) => setOpenAIApiKey(e.target.value)}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  className="block w-full pr-10 border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   placeholder="sk-..."
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowApiKey(!showApiKey)}
-                  className="absolute inset-y-0 right-0 px-3 flex items-center text-sm text-gray-600 hover:text-gray-900"
-                >
-                  {showApiKey ? 'Hide' : 'Show'}
-                </button>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                  {hasValidApiKey() ? (
+                    <Check className="h-5 w-5 text-green-500" />
+                  ) : openAIApiKey ? (
+                    <AlertTriangle className="h-5 w-5 text-amber-500" />
+                  ) : null}
+                </div>
               </div>
+              <button
+                type="button"
+                onClick={() => setShowApiKey(!showApiKey)}
+                className="mt-2 text-sm text-gray-500 hover:text-gray-700"
+              >
+                {showApiKey ? 'Hide' : 'Show'} API Key
+              </button>
+              {openAIApiKey && !hasValidApiKey() && (
+                <p className="mt-2 text-sm text-amber-600">
+                  API key should start with 'sk-' and be at least 20 characters long
+                </p>
+              )}
+              {hasValidApiKey() && (
+                <p className="mt-2 text-sm text-green-600 flex items-center">
+                  <Check className="h-4 w-4 mr-1" />
+                  API key is valid
+                </p>
+              )}
               <p className="mt-1 text-xs text-gray-500">
                 Required for AI-powered features. Get your API key from{' '}
                 <a
