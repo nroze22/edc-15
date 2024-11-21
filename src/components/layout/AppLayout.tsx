@@ -161,26 +161,6 @@ export default function AppLayout({ onSignOut }: AppLayoutProps) {
       ]
     },
     {
-      name: 'Study Inventory',
-      group: 'inventory',
-      icon: Boxes,
-      children: [
-        { name: 'Supply Management', href: '/app/supplies', icon: Boxes },
-        { name: 'Drug Accountability', href: '/app/drug-accountability', icon: Briefcase },
-        { name: 'Sample Tracking', href: '/app/sample-tracking', icon: Network },
-      ]
-    },
-    { 
-      name: 'Documentation', 
-      href: '/app/docs', 
-      icon: BookOpen 
-    },
-    { 
-      name: 'Clinical Review', 
-      href: '/app/clinical-review', 
-      icon: Stethoscope 
-    },
-    {
       name: 'Administration',
       group: 'admin',
       icon: Settings,
@@ -199,7 +179,7 @@ export default function AppLayout({ onSignOut }: AppLayoutProps) {
       icon: HelpCircle,
       children: [
         { name: 'Training', href: '/app/training', icon: Laptop },
-        { name: 'Documentation', href: '/app/help-docs', icon: BookOpen },
+        { name: 'Help & Documentation', href: '/app/help-docs', icon: HelpCircle },
         { name: 'Support', href: '/app/support', icon: LifeBuoy },
       ]
     }

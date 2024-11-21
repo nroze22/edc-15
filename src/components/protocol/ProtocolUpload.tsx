@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, FileText, AlertTriangle, Brain } from 'lucide-react';
+import { Upload, FileText, AlertTriangle, Brain, Calendar, Users, Stethoscope, Building2, FlaskConical } from 'lucide-react';
 import { StudyDetails } from '../../stores/protocolStore';
 
 interface ProtocolUploadProps {
@@ -25,7 +25,16 @@ export default function ProtocolUpload({
     title: '',
     phase: '',
     indication: '',
-    population: ''
+    population: '',
+    sponsor: '',
+    estimatedDuration: '',
+    targetEnrollment: '',
+    numberOfSites: '',
+    primaryEndpoint: '',
+    secondaryEndpoints: '',
+    inclusionCriteria: '',
+    exclusionCriteria: '',
+    studyType: ''
   });
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
@@ -78,153 +87,249 @@ export default function ProtocolUpload({
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setStudyDetails(prev => ({ ...prev, [name]: value }));
+  };
+
   return (
     <form onSubmit={handleSubmit} className="max-w-4xl mx-auto space-y-8">
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-2xl font-semibold text-gray-900">Upload Protocol</h3>
+              <h3 className="text-2xl font-semibold text-gray-900">Protocol Analysis</h3>
               <p className="mt-2 text-base text-gray-600">
-                Upload your study protocol document to begin analysis
+                Upload your protocol and provide key study details for comprehensive analysis
               </p>
             </div>
           </div>
 
+          {/* File Upload Section */}
           <div
             {...getRootProps()}
             className={`mt-4 flex flex-col items-center justify-center px-8 py-12 border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-300 ${
               isDragActive 
-                ? 'border-talosix-blue bg-blue-50/50 scale-[1.02]' 
+                ? 'border-blue-500 bg-blue-50/50 scale-[1.02]' 
                 : 'border-gray-300 hover:border-gray-400'
             }`}
           >
             <input {...getInputProps()} />
-            <div className="flex flex-col items-center text-center">
-              {isProcessing ? (
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-talosix-blue" />
-              ) : file ? (
-                <FileText className="h-12 w-12 text-talosix-blue" />
-              ) : (
-                <Upload className="h-12 w-12 text-gray-400" />
-              )}
-              
-              <p className="mt-4 text-sm font-medium text-gray-900">
-                {file ? file.name : 'Drop your protocol document here'}
-              </p>
-              <p className="mt-1 text-xs text-gray-500">
-                {file 
-                  ? `${(file.size / 1024 / 1024).toFixed(2)} MB`
-                  : 'PDF, DOC, DOCX up to 10MB'
-                }
-              </p>
+            <div className="space-y-4 text-center">
+              <div className="mx-auto h-12 w-12 text-gray-400">
+                {isProcessing ? (
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400" />
+                ) : (
+                  <Upload className="h-12 w-12" />
+                )}
+              </div>
+              <div className="space-y-2">
+                <p className="text-base font-medium text-gray-700">
+                  {file ? file.name : 'Drop your protocol file here, or click to browse'}
+                </p>
+                <p className="text-sm text-gray-500">
+                  Supports PDF, DOC, DOCX, and TXT (max 10MB)
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-2xl font-semibold text-gray-900">Study Details</h3>
-            <p className="mt-2 text-base text-gray-600">
-              Provide basic information about your study
-            </p>
-          </div>
+          {/* Study Details Form */}
+          <div className="mt-8 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Basic Study Information */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-medium text-gray-900 flex items-center">
+                  <FileText className="h-5 w-5 mr-2 text-gray-500" />
+                  Basic Study Information
+                </h4>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Study Title</label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={studyDetails.title}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Enter study title"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Study Phase</label>
+                  <select
+                    name="phase"
+                    value={studyDetails.phase}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                  >
+                    <option value="">Select phase</option>
+                    <option value="Phase I">Phase I</option>
+                    <option value="Phase II">Phase II</option>
+                    <option value="Phase III">Phase III</option>
+                    <option value="Phase IV">Phase IV</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Study Type</label>
+                  <select
+                    name="studyType"
+                    value={studyDetails.studyType}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                  >
+                    <option value="">Select type</option>
+                    <option value="Interventional">Interventional</option>
+                    <option value="Observational">Observational</option>
+                    <option value="Expanded Access">Expanded Access</option>
+                  </select>
+                </div>
+              </div>
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                Study Title
-              </label>
-              <input
-                type="text"
-                id="title"
-                value={studyDetails.title}
-                onChange={(e) => setStudyDetails({ ...studyDetails, title: e.target.value })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-talosix-blue focus:ring-talosix-blue sm:text-sm"
-                placeholder="Enter study title"
-              />
+              {/* Study Population */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-medium text-gray-900 flex items-center">
+                  <Users className="h-5 w-5 mr-2 text-gray-500" />
+                  Study Population
+                </h4>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Indication</label>
+                  <input
+                    type="text"
+                    name="indication"
+                    value={studyDetails.indication}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Primary indication"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Target Population</label>
+                  <input
+                    type="text"
+                    name="population"
+                    value={studyDetails.population}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="e.g., Adults 18-65 years"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Target Enrollment</label>
+                  <input
+                    type="text"
+                    name="targetEnrollment"
+                    value={studyDetails.targetEnrollment}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Number of participants"
+                  />
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label htmlFor="phase" className="block text-sm font-medium text-gray-700">
-                Study Phase
-              </label>
-              <select
-                id="phase"
-                value={studyDetails.phase}
-                onChange={(e) => setStudyDetails({ ...studyDetails, phase: e.target.value })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-talosix-blue focus:ring-talosix-blue sm:text-sm"
-              >
-                <option value="">Select phase</option>
-                <option value="Phase 1">Phase 1</option>
-                <option value="Phase 2">Phase 2</option>
-                <option value="Phase 3">Phase 3</option>
-                <option value="Phase 4">Phase 4</option>
-              </select>
-            </div>
+            {/* Study Design */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <h4 className="text-lg font-medium text-gray-900 flex items-center">
+                  <FlaskConical className="h-5 w-5 mr-2 text-gray-500" />
+                  Study Design
+                </h4>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Primary Endpoint</label>
+                  <textarea
+                    name="primaryEndpoint"
+                    value={studyDetails.primaryEndpoint}
+                    onChange={handleInputChange}
+                    rows={2}
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Primary endpoint description"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Secondary Endpoints</label>
+                  <textarea
+                    name="secondaryEndpoints"
+                    value={studyDetails.secondaryEndpoints}
+                    onChange={handleInputChange}
+                    rows={2}
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Key secondary endpoints"
+                  />
+                </div>
+              </div>
 
-            <div>
-              <label htmlFor="indication" className="block text-sm font-medium text-gray-700">
-                Indication
-              </label>
-              <input
-                type="text"
-                id="indication"
-                value={studyDetails.indication}
-                onChange={(e) => setStudyDetails({ ...studyDetails, indication: e.target.value })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-talosix-blue focus:ring-talosix-blue sm:text-sm"
-                placeholder="Enter study indication"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="population" className="block text-sm font-medium text-gray-700">
-                Study Population
-              </label>
-              <input
-                type="text"
-                id="population"
-                value={studyDetails.population}
-                onChange={(e) => setStudyDetails({ ...studyDetails, population: e.target.value })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-talosix-blue focus:ring-talosix-blue sm:text-sm"
-                placeholder="Describe study population"
-              />
+              {/* Study Operations */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-medium text-gray-900 flex items-center">
+                  <Building2 className="h-5 w-5 mr-2 text-gray-500" />
+                  Study Operations
+                </h4>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Sponsor</label>
+                  <input
+                    type="text"
+                    name="sponsor"
+                    value={studyDetails.sponsor}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Sponsoring organization"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Estimated Duration</label>
+                  <input
+                    type="text"
+                    name="estimatedDuration"
+                    value={studyDetails.estimatedDuration}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="e.g., 24 months"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Number of Sites</label>
+                  <input
+                    type="text"
+                    name="numberOfSites"
+                    value={studyDetails.numberOfSites}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Expected number of sites"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
           {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="flex">
-                <AlertTriangle className="h-5 w-5 text-red-400" />
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">Error</h3>
-                  <div className="mt-2 text-sm text-red-700">
-                    <p>{error}</p>
-                  </div>
-                </div>
+            <div className="p-4 bg-red-50 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <AlertTriangle className="h-5 w-5 text-red-500" />
+                <span className="text-red-700">{error}</span>
               </div>
             </div>
           )}
 
-          <div className="flex justify-end space-x-4">
+          <div className="flex justify-end">
             <button
               type="submit"
               disabled={!file || isAnalyzing}
-              className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
+              className={`flex items-center px-6 py-3 rounded-lg text-white ${
                 !file || isAnalyzing
-                  ? 'bg-gray-300 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-talosix-blue to-talosix-purple hover:opacity-90'
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700'
               }`}
             >
               {isAnalyzing ? (
                 <>
-                  <Brain className="animate-pulse h-4 w-4 mr-2" />
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
                   Analyzing...
                 </>
               ) : (
-                'Analyze Protocol'
+                <>
+                  <Brain className="h-5 w-5 mr-2" />
+                  Begin Analysis
+                </>
               )}
             </button>
           </div>

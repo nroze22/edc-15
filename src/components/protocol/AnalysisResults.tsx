@@ -8,7 +8,8 @@ import {
   Calendar,
   BarChart3,
   ArrowRight,
-  Filter
+  Filter,
+  Brain
 } from 'lucide-react';
 import clsx from 'classnames';
 
@@ -95,25 +96,34 @@ export default function AnalysisResults({
             <BarChart3 className="h-5 w-5 text-gray-400" />
           </div>
           <p className="mt-2 text-2xl font-semibold text-gray-900">
-            {Math.round(results.metrics.complexity * 100)}%
+            {(results.metrics.complexity * 100).toFixed(1)}%
+          </p>
+          <p className="mt-1 text-sm text-gray-500">
+            Based on visit frequency and procedures
           </p>
         </div>
         <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-gray-500">Completeness</h3>
-            <CheckCircle2 className="h-5 w-5 text-gray-400" />
+            <h3 className="text-sm font-medium text-gray-500">Data Burden</h3>
+            <FileText className="h-5 w-5 text-gray-400" />
           </div>
           <p className="mt-2 text-2xl font-semibold text-gray-900">
-            {Math.round(results.metrics.completeness * 100)}%
+            {(results.metrics.dataBurden * 100).toFixed(1)}%
+          </p>
+          <p className="mt-1 text-sm text-gray-500">
+            Relative to similar studies
           </p>
         </div>
         <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-gray-500">Efficiency Score</h3>
-            <Calendar className="h-5 w-5 text-gray-400" />
+            <h3 className="text-sm font-medium text-gray-500">Optimization Score</h3>
+            <Brain className="h-5 w-5 text-gray-400" />
           </div>
           <p className="mt-2 text-2xl font-semibold text-gray-900">
-            {Math.round(results.metrics.efficiency * 100)}%
+            {(results.metrics.optimizationScore * 100).toFixed(1)}%
+          </p>
+          <p className="mt-1 text-sm text-gray-500">
+            Potential for improvement
           </p>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Users,
   FileSpreadsheet,
@@ -11,11 +12,15 @@ import {
   AlertTriangle,
   BarChart3,
   Calendar,
+  Plus,
+  Search,
+  Bell,
 } from 'lucide-react';
 import Joyride, { CallBackProps, STATUS } from 'react-joyride';
 import { useStore } from '../store';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [showWelcomeGuide, setShowWelcomeGuide] = useState(false);
   const { hasSeenTour, setHasSeenTour } = useStore();
 
@@ -38,6 +43,7 @@ export default function Dashboard() {
       change: '+2',
       changeType: 'increase',
       icon: FileSpreadsheet,
+      description: 'Currently running clinical trials'
     },
     {
       name: 'Total Participants',
@@ -45,6 +51,7 @@ export default function Dashboard() {
       change: '+18%',
       changeType: 'increase',
       icon: Users,
+      description: 'Across all active studies'
     },
     {
       name: 'Data Quality',
@@ -52,6 +59,15 @@ export default function Dashboard() {
       change: '+2.1%',
       changeType: 'increase',
       icon: CheckCircle2,
+      description: 'Overall data completion rate'
+    },
+    {
+      name: 'Open Queries',
+      value: '24',
+      change: '-5',
+      changeType: 'decrease',
+      icon: AlertCircle,
+      description: 'Requiring attention'
     }
   ];
 
@@ -92,7 +108,8 @@ export default function Dashboard() {
       progress: 68,
       sites: 12,
       participants: 450,
-      status: 'active'
+      status: 'active',
+      phase: 'Phase III'
     },
     {
       id: 'ONCO-274',
@@ -100,7 +117,8 @@ export default function Dashboard() {
       progress: 42,
       sites: 8,
       participants: 180,
-      status: 'active'
+      status: 'active',
+      phase: 'Phase III'
     },
     {
       id: 'DIAB-112',
@@ -108,7 +126,8 @@ export default function Dashboard() {
       progress: 89,
       sites: 15,
       participants: 720,
-      status: 'active'
+      status: 'active',
+      phase: 'Phase IV'
     }
   ];
 
@@ -138,7 +157,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="space-y-6 dashboard-overview">
+    <div className="p-6 max-w-[1920px] mx-auto dashboard-overview">
       <Joyride
         steps={steps}
         run={!hasSeenTour}
@@ -154,49 +173,60 @@ export default function Dashboard() {
         }}
       />
 
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Welcome back</h1>
+      {/* Top Bar */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
+        <div className="mb-4 md:mb-0">
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Here's an overview of your clinical research activities
+            Overview of your clinical research activities
           </p>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search studies..."
+              className="w-64 pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+          </div>
+          <button className="relative p-2 text-gray-400 hover:text-gray-500">
+            <Bell className="h-6 w-6" />
+            <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+          </button>
           <button className="btn-primary flex items-center">
-            <Calendar className="h-4 w-4 mr-2" />
-            Schedule Review
+            <Plus className="h-4 w-4 mr-2" />
+            New Study
           </button>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 study-metrics">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 study-metrics">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.name} className="card flex items-center">
-              <div className="flex-1">
-                <dt className="text-sm font-medium text-gray-500 truncate">
-                  {stat.name}
-                </dt>
-                <dd className="mt-1 flex items-baseline">
-                  <div className="flex items-center text-2xl font-semibold text-gray-900">
-                    {stat.value}
+            <div key={stat.name} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">{stat.name}</p>
+                  <div className="mt-2 flex items-baseline">
+                    <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
+                    <span className={`ml-2 text-sm font-medium ${
+                      stat.changeType === 'increase' ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {stat.change}
+                    </span>
                   </div>
-                  <div className={`ml-2 flex items-baseline text-sm font-medium ${
+                  <p className="mt-1 text-sm text-gray-500">{stat.description}</p>
+                </div>
+                <div className={`p-3 rounded-lg ${
+                  stat.changeType === 'increase' ? 'bg-green-50' : 'bg-red-50'
+                }`}>
+                  <Icon className={`h-6 w-6 ${
                     stat.changeType === 'increase' ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {stat.change}
-                  </div>
-                </dd>
-              </div>
-              <div className={`p-3 rounded-lg ${
-                stat.changeType === 'increase' ? 'bg-green-50' : 'bg-red-50'
-              }`}>
-                <Icon className={`h-6 w-6 ${
-                  stat.changeType === 'increase' ? 'text-green-600' : 'text-red-600'
-                }`} />
+                  }`} />
+                </div>
               </div>
             </div>
           );
@@ -204,88 +234,118 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Active Studies */}
-        <div className="card">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-medium text-gray-900">Active Studies</h2>
-            <button className="btn-text">
-              View all
-              <ArrowUpRight className="ml-1 h-4 w-4" />
-            </button>
-          </div>
-          <div className="space-y-4">
-            {activeStudies.map((study) => (
-              <div key={study.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-green-400" />
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {study.name}
-                    </p>
-                  </div>
-                  <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500">
-                    <span>{study.sites} sites</span>
-                    <span>•</span>
-                    <span>{study.participants} participants</span>
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <div className="flex items-center">
-                    <span className="text-sm font-medium text-gray-900">{study.progress}%</span>
-                    <BarChart3 className="ml-2 h-4 w-4 text-gray-400" />
-                  </div>
-                </div>
+        <div className="lg:col-span-2">
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Active Studies</h2>
+                <p className="text-sm text-gray-500">Current clinical trials in progress</p>
               </div>
-            ))}
+              <button className="btn-text">
+                View all
+                <ArrowUpRight className="ml-1 h-4 w-4" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              {activeStudies.map((study) => (
+                <div
+                  key={study.id}
+                  onClick={() => navigate(`/app/study/${study.id}`)}
+                  className="group p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all cursor-pointer"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center space-x-3">
+                        <div className="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-green-400" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+                            {study.name}
+                          </p>
+                          <p className="mt-1 text-xs text-gray-500">{study.phase}</p>
+                        </div>
+                      </div>
+                      <div className="mt-2 flex items-center space-x-4">
+                        <div className="flex items-center text-sm text-gray-500">
+                          <Users className="h-4 w-4 mr-1" />
+                          <span>{study.participants}</span>
+                        </div>
+                        <div className="flex items-center text-sm text-gray-500">
+                          <FileSpreadsheet className="h-4 w-4 mr-1" />
+                          <span>{study.sites} sites</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="ml-4 flex flex-col items-end">
+                      <div className="flex items-center mb-2">
+                        <span className="text-sm font-medium text-gray-900">{study.progress}%</span>
+                        <BarChart3 className="ml-2 h-4 w-4 text-gray-400" />
+                      </div>
+                      <div className="w-32 h-2 bg-gray-200 rounded-full">
+                        <div
+                          className="h-2 bg-blue-500 rounded-full"
+                          style={{ width: `${study.progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Recent Activity */}
-        <div className="card">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-medium text-gray-900">Recent Activity</h2>
-            <button className="btn-text">
-              View all
-              <ArrowUpRight className="ml-1 h-4 w-4" />
-            </button>
-          </div>
-          <div className="space-y-4">
-            {recentActivity.map((activity) => (
-              <div key={activity.id} className="flex space-x-3">
-                <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
-                  activity.status === 'success' ? 'bg-green-50' :
-                  activity.status === 'warning' ? 'bg-yellow-50' :
-                  'bg-red-50'
-                }`}>
-                  {activity.status === 'success' && <CheckCircle2 className="h-5 w-5 text-green-600" />}
-                  {activity.status === 'warning' && <AlertTriangle className="h-5 w-5 text-yellow-600" />}
-                  {activity.status === 'error' && <XCircle className="h-5 w-5 text-red-600" />}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-gray-900">
-                    {activity.description}
-                  </div>
-                  <div className="mt-0.5 text-sm text-gray-500">
-                    <span>{activity.study}</span>
-                    <span className="mx-1">•</span>
-                    <span>{activity.user}</span>
-                  </div>
-                </div>
-                <div className="flex-shrink-0 flex items-center text-sm text-gray-500">
-                  <Clock className="mr-1.5 h-4 w-4" />
-                  {activity.time}
-                </div>
+        <div className="lg:col-span-1">
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+                <p className="text-sm text-gray-500">Latest updates across studies</p>
               </div>
-            ))}
+              <button className="btn-text">
+                View all
+                <ArrowUpRight className="ml-1 h-4 w-4" />
+              </button>
+            </div>
+            <div className="space-y-6">
+              {recentActivity.map((activity) => (
+                <div key={activity.id} className="flex items-start space-x-4">
+                  <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
+                    activity.status === 'success' ? 'bg-green-50' :
+                    activity.status === 'warning' ? 'bg-yellow-50' :
+                    'bg-red-50'
+                  }`}>
+                    {activity.status === 'success' && <CheckCircle2 className="h-5 w-5 text-green-600" />}
+                    {activity.status === 'warning' && <AlertTriangle className="h-5 w-5 text-yellow-600" />}
+                    {activity.status === 'error' && <XCircle className="h-5 w-5 text-red-600" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900">
+                      {activity.description}
+                    </p>
+                    <div className="mt-1 text-xs text-gray-500">
+                      <span className="font-medium">{activity.study}</span>
+                      <span className="mx-1">•</span>
+                      <span>{activity.user}</span>
+                    </div>
+                    <div className="mt-1 flex items-center text-xs text-gray-500">
+                      <Clock className="mr-1 h-3 w-3" />
+                      {activity.time}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Welcome Guide */}
       {showWelcomeGuide && (
-        <div className="modal-backdrop">
-          <div className="modal-content mx-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-lg max-w-md w-full mx-4">
             <div className="p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">
                 Welcome to TalosIX EDC
@@ -297,7 +357,7 @@ export default function Dashboard() {
               <div className="flex justify-end space-x-4">
                 <button
                   onClick={handleCloseWelcome}
-                  className="btn-secondary"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
                 >
                   Skip
                 </button>
@@ -306,7 +366,7 @@ export default function Dashboard() {
                     handleCloseWelcome();
                     setHasSeenTour(false);
                   }}
-                  className="btn-primary"
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
                 >
                   Start Tour
                 </button>

@@ -48,6 +48,7 @@ import SiteMonitoring from './pages/SiteMonitoring';
 import CRFBuilder from './pages/CRFBuilder';
 import StudyInformation from './pages/StudyInformation';
 import PatientData from './pages/PatientData';
+import StudyDashboard from './pages/StudyDashboard';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -85,6 +86,7 @@ export default function App() {
           <Route path="/app" element={<AppLayout onSignOut={handleSignOut} />}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
+            <Route path="study/:studyId" element={<StudyDashboard />} />
             <Route path="study-information" element={<StudyInformation />} />
             <Route path="study-setup" element={<StudySetup />} />
             <Route path="protocol-analysis" element={<ProtocolAnalysis />} />
