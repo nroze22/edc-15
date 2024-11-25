@@ -18,11 +18,15 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['@headlessui/react', 'lucide-react']
+          vendor: ['react', 'react-dom'],
+          ui: ['@headlessui/react', 'lucide-react'],
+          charts: ['chart.js', 'react-chartjs-2'],
+          editor: ['@tiptap/react', '@tiptap/starter-kit', '@tiptap/extension-table'],
+          utils: ['date-fns', 'classnames', 'clsx']
         }
       }
-    }
+    },
+    chunkSizeWarningLimit: 1000
   },
   server: {
     port: 3000,

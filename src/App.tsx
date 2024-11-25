@@ -49,6 +49,7 @@ import CRFBuilder from './pages/CRFBuilder';
 import StudyInformation from './pages/StudyInformation';
 import PatientData from './pages/PatientData';
 import StudyDashboard from './pages/StudyDashboard';
+import DemographicsPreview from './pages/DemographicsPreview';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -95,6 +96,7 @@ export default function App() {
             <Route path="participants" element={<ParticipantManagement />} />
             <Route path="study-management" element={<StudyManagement />} />
             <Route path="ai-suggestions" element={<AISuggestions />} />
+            <Route path="demographics-preview" element={<DemographicsPreview />} />
             <Route path="settings" element={<Settings />} />
             <Route path="docs" element={<Documentation />} />
             <Route path="sites" element={<Sites />} />

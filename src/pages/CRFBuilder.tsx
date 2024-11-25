@@ -121,7 +121,89 @@ const CRFBuilder = () => {
       updatedAt: new Date().toISOString(),
       version: '1.0.0',
     };
+
+    // If it's the demographics template, add the demographics form structure
+    if (template.id === 'demographics') {
+      newForm.sections = [{
+        id: window.crypto.randomUUID(),
+        title: 'Demographics',
+        description: 'Participant demographic information',
+        fields: [
+          {
+            id: window.crypto.randomUUID(),
+            type: 'text',
+            label: 'Participant ID',
+            required: true,
+            validation: ['min:1', 'regex:/^[A-Za-z0-9-]+$/']
+          },
+          {
+            id: window.crypto.randomUUID(),
+            type: 'date',
+            label: 'Date of Birth',
+            required: true
+          },
+          {
+            id: window.crypto.randomUUID(),
+            type: 'number',
+            label: 'Age',
+            required: true,
+            validation: ['min:0', 'max:120']
+          },
+          {
+            id: window.crypto.randomUUID(),
+            type: 'select',
+            label: 'Sex at Birth',
+            required: true,
+            options: ['male', 'female', 'other', 'prefer_not_to_say']
+          },
+          {
+            id: window.crypto.randomUUID(),
+            type: 'select',
+            label: 'Gender',
+            required: true,
+            options: ['male', 'female', 'non_binary', 'other', 'prefer_not_to_say']
+          },
+          {
+            id: window.crypto.randomUUID(),
+            type: 'select',
+            label: 'Ethnicity',
+            required: true,
+            options: ['hispanic_latino', 'not_hispanic_latino', 'unknown', 'prefer_not_to_say']
+          },
+          {
+            id: window.crypto.randomUUID(),
+            type: 'select',
+            label: 'Race',
+            required: true,
+            options: ['american_indian', 'asian', 'black', 'pacific_islander', 'white', 'other', 'prefer_not_to_say']
+          },
+          {
+            id: window.crypto.randomUUID(),
+            type: 'text',
+            label: 'Primary Language',
+            required: true
+          },
+          {
+            id: window.crypto.randomUUID(),
+            type: 'number',
+            label: 'Height (cm)',
+            required: true,
+            validation: ['min:0', 'max:300']
+          },
+          {
+            id: window.crypto.randomUUID(),
+            type: 'number',
+            label: 'Weight (kg)',
+            required: true,
+            validation: ['min:0', 'max:500']
+          }
+        ]
+      }];
+    }
+
     addForm(newForm);
+    setCurrentForm(newForm);
+    setShowTemplateLibrary(false);
     setCurrentStep(CRFBuilderStep.FORM_DESIGN);
   };
 

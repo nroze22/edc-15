@@ -629,115 +629,246 @@ Provide schedule in the following JSON structure:
     includeSchedule: boolean,
     analysisResults: AIAnalysisResult
   ): Promise<FinalDocuments> {
-    this.ensureInitialized();
-
     try {
-      // First, create a context object with all the necessary information
-      const context = {
-        originalContent: content,
-        selectedSuggestions: selectedSuggestions,
-        analysisResults: analysisResults,
-        includeSchedule: includeSchedule
-      };
-
-      // Split the request into smaller chunks if needed
-      const chunks = this.chunkText(content);
-      let finalProtocol = '';
-
-      // Process each chunk and combine the results
-      for (const chunk of chunks) {
-        const response = await this.openai!.chat.completions.create({
-          model: 'gpt-4',
-          messages: [
-            {
-              role: 'system',
-              content: `You are an expert in clinical trial protocol optimization. Generate an improved protocol section that:
-              - Incorporates the selected improvements
-              - Maintains clear structure and formatting
-              - Uses professional medical terminology
-              - Follows regulatory guidelines
-              - Ensures consistency with other sections`
-            },
-            {
-              role: 'user',
-              content: JSON.stringify({
-                chunk,
-                context: context
-              })
+      this.ensureInitialized();
+      
+      // Step 1: Generate enhanced protocol with structured sections
+      const protocolResponse = await this.openai!.chat.completions.create({
+        model: 'gpt-4',
+        messages: [
+          {
+            role: 'system',
+            content: `You are an expert clinical trial protocol writer with extensive experience in pharmaceutical research. 
+            Your task is to enhance and structure the protocol content while incorporating the selected improvements.
+            Focus on clarity, completeness, and compliance with ICH-GCP guidelines.
+            Output should be in a clear, professional format with proper section numbering and hierarchical structure.`
+          },
+          {
+            role: 'user',
+            content: JSON.stringify({
+              originalContent: content,
+              selectedImprovements: selectedSuggestions,
+              currentAnalysis: analysisResults
+            })
+          }
+        ],
+        functions: [
+          {
+            name: 'generate_enhanced_protocol',
+            description: 'Generates an enhanced and structured protocol document',
+            parameters: {
+              type: 'object',
+              properties: {
+                sections: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      number: { type: 'string' },
+                      title: { type: 'string' },
+                      content: { type: 'string' },
+                      subsections: {
+                        type: 'array',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            number: { type: 'string' },
+                            title: { type: 'string' },
+                            content: { type: 'string' }
+                          },
+                          required: ['number', 'title', 'content']
+                        }
+                      }
+                    },
+                    required: ['number', 'title', 'content']
+                  }
+                },
+                metadata: {
+                  type: 'object',
+                  properties: {
+                    version: { type: 'string' },
+                    lastUpdated: { type: 'string' },
+                    keyChanges: {
+                      type: 'array',
+                      items: { type: 'string' }
+                    }
+                  },
+                  required: ['version', 'lastUpdated', 'keyChanges']
+                }
+              },
+              required: ['sections', 'metadata']
             }
-          ]
-        });
+          }
+        ],
+        function_call: { name: 'generate_enhanced_protocol' }
+      });
 
-        const improvedSection = response.choices[0].message.content;
-        if (improvedSection) {
-          finalProtocol += improvedSection + '\n\n';
-        }
+      let finalProtocol = content;
+      let protocolSections;
+      const functionCall = protocolResponse.choices[0].message.function_call;
+      if (functionCall?.arguments) {
+        protocolSections = JSON.parse(functionCall.arguments);
+        finalProtocol = this.formatProtocolSections(protocolSections);
       }
 
-      // Generate the final schedule if requested
       let finalSchedule = analysisResults.studySchedule;
       if (includeSchedule) {
+        // Step 2: Generate optimized schedule with detailed rationale
         const scheduleResponse = await this.openai!.chat.completions.create({
           model: 'gpt-4',
           messages: [
             {
               role: 'system',
-              content: 'You are an expert in clinical trial visit scheduling. Optimize the study schedule based on the protocol content and selected improvements.'
+              content: `You are an expert in clinical trial visit scheduling and protocol optimization.
+              Your task is to create a comprehensive study schedule that:
+              1. Optimizes visit timing and procedures based on scientific rationale
+              2. Ensures protocol objectives are met efficiently
+              3. Minimizes patient burden while maintaining data quality
+              4. Accounts for standard of care alignment
+              5. Considers operational feasibility
+              Provide detailed rationale for key scheduling decisions.`
             },
             {
               role: 'user',
               content: JSON.stringify({
+                protocolSections,
                 originalSchedule: analysisResults.studySchedule,
-                selectedSuggestions: selectedSuggestions,
-                protocolContent: finalProtocol
+                selectedSuggestions,
+                currentAnalysis: analysisResults
               })
             }
           ],
           functions: [
             {
               name: 'generate_optimized_schedule',
-              description: 'Generates an optimized study schedule',
+              description: 'Generates an optimized study schedule with rationale',
               parameters: {
                 type: 'object',
                 properties: {
-                  visits: {
-                    type: 'array',
-                    items: {
-                      type: 'object',
-                      properties: {
-                        name: { type: 'string' },
-                        window: { type: 'string' },
-                        procedures: {
-                          type: 'array',
-                          items: {
-                            type: 'object',
-                            properties: {
-                              name: { type: 'string' },
-                              required: { type: 'boolean' },
-                              notes: { type: 'string' }
+                  schedule: {
+                    type: 'object',
+                    properties: {
+                      visits: {
+                        type: 'array',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            name: { type: 'string' },
+                            window: { type: 'string' },
+                            timepoint: { type: 'string' },
+                            procedures: {
+                              type: 'array',
+                              items: {
+                                type: 'object',
+                                properties: {
+                                  name: { type: 'string' },
+                                  required: { type: 'boolean' },
+                                  notes: { type: 'string' },
+                                  rationale: { type: 'string' }
+                                },
+                                required: ['name', 'required']
+                              }
                             },
-                            required: ['name', 'required']
-                          }
+                            rationale: { type: 'string' }
+                          },
+                          required: ['name', 'window', 'procedures', 'rationale']
                         }
                       },
-                      required: ['name', 'window', 'procedures']
-                    }
-                  },
-                  procedures: {
-                    type: 'array',
-                    items: { type: 'string' }
+                      procedures: {
+                        type: 'array',
+                        items: { type: 'string' }
+                      },
+                      optimizationNotes: {
+                        type: 'array',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            category: { type: 'string' },
+                            note: { type: 'string' },
+                            impact: { type: 'string' }
+                          },
+                          required: ['category', 'note', 'impact']
+                        }
+                      }
+                    },
+                    required: ['visits', 'procedures', 'optimizationNotes']
                   }
                 },
-                required: ['visits', 'procedures']
+                required: ['schedule']
               }
             }
           ],
           function_call: { name: 'generate_optimized_schedule' }
         });
 
-        const functionCall = scheduleResponse.choices[0].message.function_call;
-        if (functionCall?.arguments) {
-          finalSchedule = JSON.parse(functionCall.arguments);
+        const scheduleFunctionCall = scheduleResponse.choices[0].message.function_call;
+        if (scheduleFunctionCall?.arguments) {
+          const scheduleData = JSON.parse(scheduleFunctionCall.arguments);
+          finalSchedule = scheduleData.schedule;
+        }
+
+        // Step 3: Final validation and consistency check
+        const validationResponse = await this.openai!.chat.completions.create({
+          model: 'gpt-4',
+          messages: [
+            {
+              role: 'system',
+              content: `You are a clinical trial protocol validation expert.
+              Your task is to ensure complete consistency between the protocol and schedule,
+              checking for any discrepancies or potential issues.`
+            },
+            {
+              role: 'user',
+              content: JSON.stringify({
+                protocol: protocolSections,
+                schedule: finalSchedule
+              })
+            }
+          ],
+          functions: [
+            {
+              name: 'validate_protocol_schedule',
+              description: 'Validates consistency between protocol and schedule',
+              parameters: {
+                type: 'object',
+                properties: {
+                  isValid: { type: 'boolean' },
+                  issues: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        type: { type: 'string' },
+                        description: { type: 'string' },
+                        recommendation: { type: 'string' },
+                        severity: { type: 'string' }
+                      },
+                      required: ['type', 'description', 'recommendation', 'severity']
+                    }
+                  },
+                  protocolUpdates: {
+                    type: 'array',
+                    items: { type: 'string' }
+                  },
+                  scheduleUpdates: {
+                    type: 'array',
+                    items: { type: 'string' }
+                  }
+                },
+                required: ['isValid', 'issues', 'protocolUpdates', 'scheduleUpdates']
+              }
+            }
+          ],
+          function_call: { name: 'validate_protocol_schedule' }
+        });
+
+        const validationFunctionCall = validationResponse.choices[0].message.function_call;
+        if (validationFunctionCall?.arguments) {
+          const validationResults = JSON.parse(validationFunctionCall.arguments);
+          if (!validationResults.isValid) {
+            // Apply critical fixes if any
+            this.applyValidationFixes(finalProtocol, finalSchedule, validationResults);
+          }
         }
       }
 
@@ -751,27 +882,47 @@ Provide schedule in the following JSON structure:
     }
   }
 
-  public async sendChatMessage(content: string, history: any[]): Promise<string> {
-    this.ensureInitialized();
-
-    try {
-      const response = await this.openai!.chat.completions.create({
-        model: 'gpt-4',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a helpful clinical research assistant, providing clear and accurate information about clinical trials, protocols, and EDC systems.'
-          },
-          ...history,
-          { role: 'user', content }
-        ]
+  private formatProtocolSections(sections: any): string {
+    let formattedProtocol = '';
+    
+    // Add metadata header
+    formattedProtocol += `Protocol Version: ${sections.metadata.version}\n`;
+    formattedProtocol += `Last Updated: ${sections.metadata.lastUpdated}\n\n`;
+    
+    if (sections.metadata.keyChanges.length > 0) {
+      formattedProtocol += 'Key Changes:\n';
+      sections.metadata.keyChanges.forEach((change: string) => {
+        formattedProtocol += `- ${change}\n`;
       });
-
-      return response.choices[0].message.content || 'I apologize, but I was unable to generate a response.';
-    } catch (error) {
-      console.error('Error sending chat message:', error);
-      throw error;
+      formattedProtocol += '\n';
     }
+
+    // Format sections with proper hierarchy
+    sections.sections.forEach((section: any) => {
+      formattedProtocol += `${section.number}. ${section.title}\n\n`;
+      formattedProtocol += `${section.content}\n\n`;
+
+      if (section.subsections) {
+        section.subsections.forEach((subsection: any) => {
+          formattedProtocol += `${section.number}.${subsection.number} ${subsection.title}\n\n`;
+          formattedProtocol += `${subsection.content}\n\n`;
+        });
+      }
+    });
+
+    return formattedProtocol;
+  }
+
+  private applyValidationFixes(protocol: string, schedule: any, validationResults: any) {
+    // Apply critical protocol updates
+    validationResults.protocolUpdates.forEach((update: string) => {
+      // TODO: Implement protocol updates based on validation results
+    });
+
+    // Apply critical schedule updates
+    validationResults.scheduleUpdates.forEach((update: string) => {
+      // TODO: Implement schedule updates based on validation results
+    });
   }
 }
 

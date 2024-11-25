@@ -2,11 +2,15 @@ import { create } from 'zustand';
 
 export interface FormField {
   id: string;
-  type: string;
+  type: 'text' | 'number' | 'date' | 'select' | 'radio' | 'checkbox' | 'textarea';
   label: string;
   required: boolean;
   options?: string[];
-  validation?: Record<string, any>;
+  validation?: string[];
+  min?: number;
+  max?: number;
+  placeholder?: string;
+  description?: string;
 }
 
 export interface FormSection {

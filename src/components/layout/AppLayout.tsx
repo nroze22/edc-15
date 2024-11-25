@@ -54,6 +54,7 @@ import {
 } from 'lucide-react';
 import { useSettingsStore } from '../../stores/settingsStore';
 import clsx from 'classnames';
+import { Toaster } from '../ui/toaster';
 
 interface AppLayoutProps {
   onSignOut?: () => void;
@@ -182,6 +183,19 @@ export default function AppLayout({ onSignOut }: AppLayoutProps) {
         { name: 'Help & Documentation', href: '/app/help-docs', icon: HelpCircle },
         { name: 'Support', href: '/app/support', icon: LifeBuoy },
       ]
+    },
+    {
+      name: 'Study Setup',
+      group: 'setup',
+      icon: FileText,
+      children: [
+        { name: 'Study Information', href: '/app/study-information', icon: FileText },
+        { name: 'Protocol Analysis', href: '/app/protocol-analysis', icon: Microscope },
+        { name: 'Study Schedule', href: '/app/study-schedule', icon: Calendar },
+        { name: 'Demographics Preview', href: '/app/demographics-preview', icon: FormInput },
+        { name: 'Validation Rules', href: '/app/validation-rules', icon: Shield },
+        { name: 'Documentation', href: '/app/docs', icon: BookOpen }
+      ]
     }
   ];
 
@@ -200,7 +214,7 @@ export default function AppLayout({ onSignOut }: AppLayoutProps) {
   const isActive = (href: string) => location.pathname === href;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen flex">
       {/* Navigation Sidebar */}
       <div className={clsx(
         'fixed top-0 left-0 bottom-0 bg-[#0B1629] transition-all duration-200 ease-in-out z-30',
@@ -364,6 +378,7 @@ export default function AppLayout({ onSignOut }: AppLayoutProps) {
         <main className="flex-1">
           <Outlet />
         </main>
+        <Toaster />
       </div>
     </div>
   );
