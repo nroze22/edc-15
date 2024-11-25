@@ -19,7 +19,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
-          ui: ['@headlessui/react', 'lucide-react'],
+          ui: ['@headlessui/react', 'lucide-react', 'framer-motion'],
           charts: ['chart.js', 'react-chartjs-2'],
           editor: ['@tiptap/react', '@tiptap/starter-kit', '@tiptap/extension-table'],
           utils: ['date-fns', 'classnames', 'clsx']
