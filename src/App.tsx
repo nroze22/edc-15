@@ -50,25 +50,18 @@ import StudyInformation from './pages/StudyInformation';
 import PatientData from './pages/PatientData';
 import StudyDashboard from './pages/StudyDashboard';
 import DemographicsPreview from './pages/DemographicsPreview';
+import PasswordProtection from './components/auth/PasswordProtection';
 
-export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('isAuthenticated') === 'true';
+  });
+
   const navigate = useNavigate();
 
-  // Only check and set initial auth state, no redirect
-  useEffect(() => {
-    const authState = localStorage.getItem('isAuthenticated');
-    if (authState === 'true') {
-      setIsAuthenticated(true);
-    }
-  }, []);
-
-  const handleAuth = () => {
-    // Set auth state
+  const handleAuthentication = () => {
     setIsAuthenticated(true);
     localStorage.setItem('isAuthenticated', 'true');
-    
-    // Navigate to dashboard after successful auth
     navigate('/app/dashboard');
   };
 
@@ -78,10 +71,14 @@ export default function App() {
     navigate('/');
   };
 
+  if (!isAuthenticated) {
+    return <PasswordProtection onAuthenticated={handleAuthentication} />;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Routes>
-        <Route path="/" element={<LandingPage onAuth={handleAuth} />} />
+        <Route path="/" element={<LandingPage onAuth={handleAuthentication} />} />
         
         {isAuthenticated ? (
           <Route path="/app" element={<AppLayout onSignOut={handleSignOut} />}>
@@ -143,3 +140,5 @@ export default function App() {
     </div>
   );
 }
+
+export default App;
