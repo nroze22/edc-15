@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Brain, Settings, ChevronRight } from 'lucide-react';
 import ProtocolUpload from '../components/protocol/ProtocolUpload';
-import ProtocolAnalysisSteps from '../components/protocol/ProtocolAnalysisSteps';
+import ProtocolAnalyzer from '../components/protocol/ProtocolAnalyzer';
 import AnalysisResults from '../components/protocol/AnalysisResults';
 import FinalReview from '../components/protocol/FinalReview';
 import { useSettingsStore } from '../stores/settingsStore';
 import { useProtocolStore } from '../stores/protocolStore';
 import ApiKeyRequired from '../components/common/ApiKeyRequired';
+import { AnalysisResult, StudyDetails } from '../types/protocol';
 
 export default function ProtocolAnalysis() {
   const navigate = useNavigate();
-  const { hasValidApiKey } = useSettingsStore();
+  const { hasValidApiKey, apiKey } = useSettingsStore();
   const { 
     currentStep,
     protocolFile,
@@ -23,6 +24,7 @@ export default function ProtocolAnalysis() {
     setProtocolFile,
     setProtocolContent,
     setStudyDetails,
+    setAnalysisResults,
     analyzeProtocol,
     generateFinalDocuments,
     nextStep,
@@ -42,96 +44,115 @@ export default function ProtocolAnalysis() {
     setProtocolContent(content);
   };
 
-  const handleDetailsSubmit = async (details: typeof studyDetails) => {
+  const handleDetailsSubmit = async (details: StudyDetails) => {
     setStudyDetails(details);
     await analyzeProtocol();
   };
 
-  const handleSuggestionSelection = async (selectedSuggestions: string[], includeSchedule: boolean) => {
-    await generateFinalDocuments(selectedSuggestions, includeSchedule);
-    // After finalizing, show option to proceed to Form Builder
-    if (includeSchedule) {
-      navigate('/app/form-builder');
-    }
+  const handleAnalysisComplete = (result: AnalysisResult) => {
+    setAnalysisResults(result);
+    nextStep();
   };
 
-  if (!hasValidApiKey()) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-6">Protocol Analysis</h1>
-        <ApiKeyRequired message="Protocol Analysis requires an OpenAI API key to analyze and process your protocol document." />
-      </div>
-    );
+  const handleSuggestionSelection = async (selectedSuggestions: string[], includeSchedule: boolean) => {
+    await generateFinalDocuments(selectedSuggestions, includeSchedule);
+  };
+
+  if (!hasValidApiKey) {
+    return <ApiKeyRequired />;
   }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="md:flex md:items-center md:justify-between mb-8">
-        <div className="flex-1 min-w-0">
-          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-            Protocol Analysis
-          </h2>
-          <p className="mt-1 text-sm text-gray-500">
-            Upload and analyze your protocol document to generate study forms and schedules
-          </p>
-        </div>
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => setShowSettings(true)}
-            className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-          >
-            <Settings className="h-4 w-4 mr-2" />
-            Settings
-          </button>
-        </div>
+      {/* Progress Steps */}
+      <div className="mb-8">
+        <nav aria-label="Progress">
+          <ol className="flex items-center">
+            {steps.map((step, stepIdx) => (
+              <li key={step.id} className={`relative ${stepIdx !== steps.length - 1 ? 'pr-8 sm:pr-20' : ''}`}>
+                <div className="flex items-center">
+                  <div
+                    className={`relative flex h-8 w-8 items-center justify-center rounded-full ${
+                      step.id < currentStep
+                        ? 'bg-blue-600'
+                        : step.id === currentStep
+                        ? 'bg-blue-600'
+                        : 'bg-gray-200'
+                    }`}
+                  >
+                    <span className="text-white text-sm">{step.id}</span>
+                  </div>
+                  {stepIdx !== steps.length - 1 && (
+                    <div className="absolute top-4 w-full h-0.5 -right-4">
+                      <div
+                        className={`h-0.5 ${
+                          step.id < currentStep ? 'bg-blue-600' : 'bg-gray-200'
+                        }`}
+                      />
+                    </div>
+                  )}
+                </div>
+                <div className="mt-2">
+                  <span className="text-sm font-medium">{step.name}</span>
+                  <p className="text-sm text-gray-500">{step.description}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </nav>
       </div>
 
-      <ProtocolAnalysisSteps steps={steps} currentStep={currentStep} />
-
-      <div className="mt-8">
+      {/* Main Content */}
+      <div className="bg-white shadow-sm rounded-lg">
         {currentStep === 1 && (
           <ProtocolUpload
             onFileUpload={handleFileUpload}
             onDetailsSubmit={handleDetailsSubmit}
+            file={protocolFile}
             studyDetails={studyDetails}
-            isAnalyzing={isAnalyzing}
-            error={error}
           />
         )}
+
         {currentStep === 2 && (
-          <AnalysisResults
-            results={analysisResults}
-            isLoading={isAnalyzing}
-            error={error}
-            onNext={nextStep}
-            onBack={previousStep}
-            onSuggestionSelection={handleSuggestionSelection}
-          />
-        )}
-        {currentStep === 3 && (
-          <div className="space-y-6">
-            <FinalReview
-              protocolContent={protocolContent}
-              suggestions={analysisResults?.suggestions || []}
-              studySchedule={analysisResults?.studySchedule}
-              onFinalize={generateFinalDocuments}
-              onBack={previousStep}
+          <div className="p-6">
+            <ProtocolAnalyzer
+              content={protocolContent}
+              studyDetails={studyDetails}
+              onAnalysisComplete={handleAnalysisComplete}
+              apiKey={apiKey}
             />
-            
-            {/* Next Steps Card */}
-            <div className="mt-8 bg-gray-50 rounded-lg p-6 border border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Next Steps</h3>
-              <div className="flex items-start space-x-4">
-                <button
-                  onClick={() => navigate('/app/form-builder')}
-                  className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-talosix-blue to-talosix-purple rounded-md hover:opacity-90"
-                >
-                  Proceed to Form Builder
-                  <ChevronRight className="ml-2 h-4 w-4" />
-                </button>
-              </div>
-            </div>
           </div>
+        )}
+
+        {currentStep === 3 && analysisResults && (
+          <div className="p-6">
+            <AnalysisResults
+              results={analysisResults}
+              onSuggestionSelection={handleSuggestionSelection}
+              isLoading={isAnalyzing}
+              error={error}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Navigation Buttons */}
+      <div className="mt-6 flex justify-between">
+        <button
+          onClick={previousStep}
+          disabled={currentStep === 1}
+          className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Previous
+        </button>
+        {currentStep < steps.length && (
+          <button
+            onClick={nextStep}
+            disabled={!analysisResults && currentStep === 2}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
         )}
       </div>
     </div>
